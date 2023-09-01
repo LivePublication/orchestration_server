@@ -22,6 +22,12 @@ def index():
     return flask.render_template('index.html', title='Title', text='This is the home page')
 
 
+# Serve static files - this is only for development, nginx will serve these in production
+@app.route('/static/<path:filespec>')
+def static_files(filespec):
+    return flask.send_from_directory('static', filespec)
+
+
 # Example POST REST endpoint
 @app.route('/test/', methods=['POST'])
 def test():
