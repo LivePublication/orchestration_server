@@ -27,6 +27,10 @@ def index():
 def static_files(filespec):
     return flask.send_from_directory('static', filespec)
 
+@app.route('/static/favicon/<path:filespec>')
+def static_favicon(filespec):
+    return flask.send_from_directory('static/favicon', filespec)
+
 
 # Example POST REST endpoint
 @app.route('/test/', methods=['POST'])
