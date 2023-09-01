@@ -51,6 +51,3 @@ On the server, watch the gunicorn logs to see the requests come in:
 ```
 watch -n 5 tail -n 50 ~/gunicorn.log
 ```
-
-## Watch the log file
-The server should now be running and producing output
