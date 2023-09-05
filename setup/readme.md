@@ -98,3 +98,49 @@ On the server, watch the gunicorn logs to see the requests come in:
 ```
 watch -n 5 tail -n 50 ~/gunicorn.log
 ```
+
+# Setting up SSL/HTTPS with LetsEncrypt/Certbot
+## Create a DNS record
+Set up openstack cli and run (worst-case need to setup everything):
+```
+mkdir openstack
+cd openstack
+sudo apt install -y python3.11 python3.11-dev python3.11-venv
+sudo apt install -y gcc
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install python-openstackclient python-designateclient
+```
+Get the credentials file from nectar and source it:
+```
+source LivePup-Globus-openrc.sh
+```
+Get the DNS zone ID (in this case, livepup-globus.cloud.edu.au.):
+```
+openstack zone list
+```
+Create the DNS record using that zone, the sub-domain name, and the host server ip:
+```
+openstack recordset create <zone-id> <name> --type A --record <server-ip>
+```
+## On the server, install certbot and run it
+First ensure that the nginx config server name matches that of the DNS record you created above.
+```
+sudo nano /etc/nginx/sites-available/default
+```
+and add/edit the server_name line (without the trailing . or slash):
+```
+server_name <name>.<zone-id>;
+```
+check the config
+```
+sudo nginx -t
+```
+
+Finally, install certbot and run it:
+```
+sudo apt-get install -y certbot python3-certbot-nginx
+sudo certbot --nginx
+```
+
+At this point, you should be able to access the server via https, and a systemd service (certbot.timer) should update the certificate before it renews.
