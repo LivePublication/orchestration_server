@@ -100,7 +100,10 @@ watch -n 5 tail -n 50 ~/gunicorn.log
 ```
 
 # Setting up SSL/HTTPS with LetsEncrypt/Certbot
+https://support.ehelp.edu.au/support/solutions/articles/6000217026-enabling-https-on-your-nectar-instance
 ## Create a DNS record
+https://support.ehelp.edu.au/support/solutions/articles/6000201311-nectar-dns-service
+https://docs.openstack.org/python-designateclient/latest/user/shell-v2.html
 Set up openstack cli and run (worst-case need to setup everything):
 ```
 mkdir openstack
@@ -112,6 +115,7 @@ source .venv/bin/activate
 pip install python-openstackclient python-designateclient
 ```
 Get the credentials file from nectar and source it:
+https://tutorials.rc.nectar.org.au/openstack-cli/04-credentials
 ```
 source LivePup-Globus-openrc.sh
 ```
@@ -124,6 +128,7 @@ Create the DNS record using that zone, the sub-domain name, and the host server 
 openstack recordset create <zone-id> <name> --type A --record <server-ip>
 ```
 ## On the server, install certbot and run it
+https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04
 First ensure that the nginx config server name matches that of the DNS record you created above.
 ```
 sudo nano /etc/nginx/sites-available/default
