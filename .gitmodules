@@ -1,0 +1,4 @@
+[submodule "orchestration_logic"]
+	path = orchestration_logic
+	url = https://github.com/LivePublication/orchestration_logic.git
+	branch = main
