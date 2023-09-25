@@ -1,3 +1,5 @@
+from pathlib import Path
+
 # Configuration for LidFlow as top level attributes (we could easily move this to a config file)
 # Customizable attributes for re-execution by readers? # TODO
 endpoints = {
@@ -28,7 +30,7 @@ intermediate_paths = {
 # TODO change article_name to subcrate_path -> will need to change in LPAPs 
 LP_configuration = {
     "orchestration_node": "None",
-    "article_name": "/Users/eller/Projects/orchestration_server/sub_crates"
+    "article_name": f"{Path.cwd()}/sub_crates"
 }
 
 # Run label and tags for the flow

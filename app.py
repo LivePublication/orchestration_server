@@ -60,6 +60,8 @@ def execute_LiD_flow():
     # Edit config to include dymamic gcp endpoint
     config["LP_configuration"]["orchestration_node"] = ep_id
 
+    print(config)
+
     # Execute the gladier flow
     lid_flow = LidFlow(endpoints=endpoints, 
                        data_paths=data_paths, 
