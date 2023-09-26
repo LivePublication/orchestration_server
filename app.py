@@ -60,8 +60,6 @@ def execute_LiD_flow():
     # Edit config to include dymamic gcp endpoint
     config["LP_configuration"]["orchestration_node"] = ep_id
 
-    print(config)
-
     # Execute the gladier flow
     lid_flow = LidFlow(endpoints=endpoints, 
                        data_paths=data_paths, 
@@ -81,8 +79,15 @@ def execute_LiD_flow():
     orchestration_crate.build_crate()
     orchestration_crate.clean_up()
 
+    # Serialize orchestration data for testing
+    # lid_flow.serrialize_data() # Serialize orchestration data for testing
+    # oCrate = Orchestration_crate(None, None, (Path.cwd() / "working_crate"), run_label, run_tags, True)
+    # oCrate.deserialize_data() # Using local data for testing
+    # oCrate.build_crate()
+    # oCrate.create_publication() # Not working or tested
+
     # Do something with query params
-    info(flask.request.args.to_dict())
+    # info(flask.request.args.to_dict())
 
     # Do something with the body if it's json
     if flask.request.is_json:
