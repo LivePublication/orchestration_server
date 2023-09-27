@@ -9,6 +9,8 @@ from orchestration_logic.orchestration_types import OrchestrationData
 from globus_sdk import LocalGlobusConnectPersonal
 from flow_config import *
 
+from apply_template import apply_template
+
 
 app = flask.Flask(__name__)
 # IMPORTANT: the commented code below is required if we're running behind a proxy (e.g.: nginx) - it should not be
@@ -79,6 +81,8 @@ def execute_LiD_flow():
     orchestration_crate.build_crate()
     orchestration_crate.clean_up()
 
+    apply_template("generated_versions/LiD/")
+
     # Serialize orchestration data for testing
     # lid_flow.serrialize_data() # Serialize orchestration data for testing
     # oCrate = Orchestration_crate(None, None, (Path.cwd() / "working_crate"), run_label, run_tags, True)
@@ -90,6 +94,12 @@ def execute_LiD_flow():
     # info(flask.request.args.to_dict())
 
     # Do something with the body if it's json
+
+
+
+
+
+
     if flask.request.is_json:
         info(flask.request.json)
 

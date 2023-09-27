@@ -2,3 +2,6 @@
 	path = orchestration_logic
 	url = https://github.com/LivePublication/orchestration_logic.git
 	branch = main
+[submodule "quarto_templates/LiD"]
+	path = quarto_templates/LiD
+	url = https://github.com/LivePublication/LP_Pub_LID.git
