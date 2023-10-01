@@ -34,5 +34,5 @@ LP_configuration = {
 }
 
 # Run label and tags for the flow
-run_label = "LiDFlow run"
+run_label = "V1"
 run_tags = ["LID", "Orchestration", "Test"]

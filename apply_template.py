@@ -12,7 +12,7 @@ def apply_template(output_path):
   # orchestration crate for the data
 
   # Create directory for the new version
-  new_version = output_path + "New_version"
+  new_version = output_path 
   os.mkdir(new_version)
 
   # Copy the template files into the new version

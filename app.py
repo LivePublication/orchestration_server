@@ -68,20 +68,20 @@ def execute_LiD_flow():
                        intermediate_paths=intermediate_paths, 
                        LP_configuration=LP_configuration, 
                        run_label=run_label, 
-                       run_tags=run_tags)
-    lid_flow.run()
-    lid_flow.monitor_run()
-    lid_flow.monitor_transfer()
-    orchestration_data: OrchestrationData = lid_flow.get_data()
+                       run_tags=run_tags)  # Create flow object. Note: The LidFlow class will be abstracted to somthing more generic in the future
+    lid_flow.run()                         # Run flow, authenticate with globus
+    lid_flow.monitor_run()                 # Wait untill Globus reports the flow as complete
+    lid_flow.monitor_transfer()            # Wait untill LPAP transfers to orchestration server are complete
+    orchestration_data: OrchestrationData = lid_flow.get_data()  # Create the orchestration data object, contains all data we need to build the orchestration crate
     orchestration_crate = Orchestration_crate(lid_flow, 
                                               orchestration_data, 
                                               (Path.cwd() / "orchestration_crate"), 
                                               config['run_label'], 
-                                              config['run_tags'])
-    orchestration_crate.build_crate()
-    orchestration_crate.clean_up()
+                                              config['run_tags'])   # Create orchestration crate object
+    orchestration_crate.build_crate()      # Finally, build the orchestration crate
+    orchestration_crate.clean_up()         # Remove local temp directories and files
 
-    apply_template("generated_versions/LiD/")
+    apply_template("generated_versions/LiD/" + config['run_label'] + "/") # Very simple 'applciation' of quarto template to the orchestration crate
 
     # Serialize orchestration data for testing
     # lid_flow.serrialize_data() # Serialize orchestration data for testing
@@ -90,15 +90,10 @@ def execute_LiD_flow():
     # oCrate.build_crate()
     # oCrate.create_publication() # Not working or tested
 
+
     # Do something with query params
     # info(flask.request.args.to_dict())
-
     # Do something with the body if it's json
-
-
-
-
-
 
     if flask.request.is_json:
         info(flask.request.json)
