@@ -69,7 +69,7 @@ def flow_status(id: str):
     else:
         return flask.jsonify({
             'status': 'running',
-            'time_elapsed': result.start_time.strftime("%H:%M:%S"),
+            'time_elapsed': getattr(result, 'start_time', datetime.datetime.now()).strftime("%H:%M:%S"),
         })
     # TODO: flow id as parameter
     states = [f'state {i}' for i in range(5)]
