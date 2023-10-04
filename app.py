@@ -1,3 +1,5 @@
+import datetime
+import numpy as np
 import flask
 import logging
 
@@ -40,6 +42,17 @@ def static_files(filespec):
 @app.route('/static/favicon/<path:filespec>')
 def static_favicon(filespec):
     return flask.send_from_directory('static/favicon', filespec)
+
+
+@app.route('/flow_status', methods=['GET'])
+def flow_status():
+    # TODO: flow id as parameter
+    states = [f'state {i}' for i in range(5)]
+    return flask.jsonify({
+        'status': 'running',
+        'time_elapsed': datetime.datetime.now().strftime("%H:%M:%S"),
+        'current_task': states[np.random.randint(0, len(states))]
+    })
 
 
 # Example POST REST endpoint
