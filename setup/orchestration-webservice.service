@@ -1,6 +1,7 @@
 [Unit]
 Description=Live Publication webserver
 After=network.target
+Wants=orchestration-webservice.celery.service
 
 [Service]
 User=ubuntu

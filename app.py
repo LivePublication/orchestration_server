@@ -3,6 +3,8 @@ import numpy as np
 import flask
 import logging
 
+from celery import shared_task
+from celery.result import AsyncResult
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pathlib import Path
 
@@ -46,13 +48,25 @@ def index():
 def static_files(filespec):
     return flask.send_from_directory('static', filespec)
 
+
 @app.route('/static/favicon/<path:filespec>')
 def static_favicon(filespec):
     return flask.send_from_directory('static/favicon', filespec)
 
 
-@app.route('/flow_status', methods=['GET'])
-def flow_status():
+@app.route('/start_flow', methods=['POST'])
+def start_flow():
+    result = run_flow.delay()
+    return flask.jsonify({'task_id': result.id})
+
+
+@app.route('/flow_status/<id>', methods=['GET'])
+def flow_status(id: str):
+    result = AsyncResult(id)
+    if result.ready():
+        return flask.jsonify({'status': 'complete'})
+    else:
+        return flask.jsonify({'status': 'running'})
     # TODO: flow id as parameter
     states = [f'state {i}' for i in range(5)]
     return flask.jsonify({
@@ -60,6 +74,45 @@ def flow_status():
         'time_elapsed': datetime.datetime.now().strftime("%H:%M:%S"),
         'current_task': states[np.random.randint(0, len(states))]
     })
+
+
+@shared_task(ignore_result=True)
+def run_flow():
+    local_gcp = LocalGlobusConnectPersonal()
+    ep_id = local_gcp.endpoint_id
+
+    # Using locally defined config, could be passed in as a parameter in json body
+    config = {
+        "endpoints": endpoints,
+        "data_paths": data_paths,
+        "intermediate_paths": intermediate_paths,
+        "LP_configuration": LP_configuration,
+        "run_label": run_label,
+        "run_tags": run_tags
+    }
+    # Edit config to include dymamic gcp endpoint
+    config["LP_configuration"]["orchestration_node"] = ep_id
+
+    # Execute the gladier flow
+    lid_flow = LidFlow(endpoints=endpoints,
+                       data_paths=data_paths,
+                       intermediate_paths=intermediate_paths,
+                       LP_configuration=LP_configuration,
+                       run_label=run_label,
+                       run_tags=run_tags)  # Create flow object. Note: The LidFlow class will be abstracted to somthing more generic in the future
+    lid_flow.run()                         # Run flow, authenticate with globus
+    lid_flow.monitor_run()                 # Wait untill Globus reports the flow as complete
+    lid_flow.monitor_transfer()            # Wait untill LPAP transfers to orchestration server are complete
+    orchestration_data: OrchestrationData = lid_flow.get_data()  # Create the orchestration data object, contains all data we need to build the orchestration crate
+    orchestration_crate = Orchestration_crate(lid_flow,
+                                              orchestration_data,
+                                              (Path.cwd() / "orchestration_crate"),
+                                              config['run_label'],
+                                              config['run_tags'])   # Create orchestration crate object
+    orchestration_crate.build_crate()      # Finally, build the orchestration crate
+    orchestration_crate.clean_up()         # Remove local temp directories and files
+
+    apply_template("generated_versions/LiD/" + config['run_label'] + "/") # Very simple 'applciation' of quarto template to the orchestration crate
 
 
 # Example POST REST endpoint

@@ -1,0 +1,10 @@
+[Unit]
+Decription=Celery worker for orchestration webservice
+After=network.target
+PartOf=orchestration-webservice.service
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/github/orchestration_server
+ExecStart=/home/ubuntu/github/orchestration_server/venv/bin/celery -A app.celery_app worker>
+Restart=always
