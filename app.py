@@ -74,7 +74,7 @@ def flow_status(id: str):
         return flask.jsonify({'status': 'complete'})
     else:
         return flask.jsonify({
-            'task_status': elapsed_time.strftime("%H:%M:%S"),
+            'task_status': str(elapsed_time),
             'status': result.state,
             'time_elapsed': getattr(result, 'start_time', datetime.datetime.now()).strftime("%H:%M:%S"),
         })
