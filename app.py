@@ -3,7 +3,7 @@ import numpy as np
 import flask
 import logging
 
-from celery import shared_task, current_task
+from celery import shared_task, current_task, Task
 from celery.result import AsyncResult
 import celery.signals
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -64,20 +64,17 @@ def start_flow():
 @app.route('/flow_status/<id>', methods=['GET'])
 def flow_status(id: str):
     result = AsyncResult(id)
+    task: Task = celery_app.tasks.get(result.name)
     if result.ready():
         return flask.jsonify({'status': 'complete'})
     else:
         return flask.jsonify({
-            'status': 'running',
+            'result': flask.jsonify(result.__dict__),
+            'task': flask.jsonify(task.__dict__),
+            'test': result.name,
+            'status': result.state,
             'time_elapsed': getattr(result, 'start_time', datetime.datetime.now()).strftime("%H:%M:%S"),
         })
-    # TODO: flow id as parameter
-    states = [f'state {i}' for i in range(5)]
-    return flask.jsonify({
-        'status': 'running',
-        'time_elapsed': datetime.datetime.now().strftime("%H:%M:%S"),
-        'current_task': states[np.random.randint(0, len(states))]
-    })
 
 
 @celery.signals.task_prerun.connect
