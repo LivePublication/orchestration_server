@@ -5,6 +5,8 @@ import logging
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pathlib import Path
+
+from celeryapp.celeryapp import celery_init_app
 from orchestration_logic.LidFlow import LidFlow
 from orchestration_logic.orchestration_crate import Orchestration_crate
 from orchestration_logic.orchestration_types import OrchestrationData
@@ -15,12 +17,17 @@ from apply_template import apply_template
 
 
 app = flask.Flask(__name__)
-# IMPORTANT: the commented code below is required if we're running behind a proxy (e.g.: nginx) - it should not be
-# uncommented otherwise
-# app.wsgi_app = ProxyFix(
-#     app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
-# )
-
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
+app.config.from_mapping(
+    CELERY=dict(
+        broker_url="redis://localhost",
+        result_backend="redis://localhost",
+        task_ignore_result=True,
+    ),
+)
+celery_app = celery_init_app(app)
 
 # Tie in gunicorn logger
 gunicorn_logger = logging.getLogger('gunicorn.error')

@@ -62,3 +62,5 @@ urllib3==2.0.5
 websockets==10.3
 Werkzeug==2.3.7
 yarl==1.9.2
+celery==5.3.4
+redis==5.0.1
