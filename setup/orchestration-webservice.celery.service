@@ -1,7 +1,8 @@
 [Unit]
 Decription=Celery worker for orchestration webservice
 After=network.target
-PartOf=orchestration-webservice.service
+# Line below triggers killing/restarting with parent service - we don't want that for debugging
+#PartOf=orchestration-webservice.service
 
 [Service]
 User=ubuntu

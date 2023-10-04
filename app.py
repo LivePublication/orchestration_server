@@ -64,14 +64,10 @@ def start_flow():
 @app.route('/flow_status/<id>', methods=['GET'])
 def flow_status(id: str):
     result = AsyncResult(id)
-    task: Task = celery_app.tasks.get(result.name)
     if result.ready():
         return flask.jsonify({'status': 'complete'})
     else:
         return flask.jsonify({
-            'result': flask.jsonify(result.__dict__),
-            'task': flask.jsonify(task.__dict__),
-            'test': result.name,
             'status': result.state,
             'time_elapsed': getattr(result, 'start_time', datetime.datetime.now()).strftime("%H:%M:%S"),
         })
