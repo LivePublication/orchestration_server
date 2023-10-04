@@ -3,6 +3,7 @@ import numpy as np
 import flask
 import logging
 
+import requests
 from celery import shared_task, current_task, Task
 from celery.result import AsyncResult
 import celery.signals
@@ -64,10 +65,14 @@ def start_flow():
 @app.route('/flow_status/<id>', methods=['GET'])
 def flow_status(id: str):
     result = AsyncResult(id)
+
+    status = requests.get(f'http://localhost:5555/api/task/info/{id}').json()
+
     if result.ready():
         return flask.jsonify({'status': 'complete'})
     else:
         return flask.jsonify({
+            'task_status': status,
             'status': result.state,
             'time_elapsed': getattr(result, 'start_time', datetime.datetime.now()).strftime("%H:%M:%S"),
         })
