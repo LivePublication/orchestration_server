@@ -9,3 +9,4 @@ User=ubuntu
 WorkingDirectory=/home/ubuntu/github/orchestration_server
 ExecStart=/home/ubuntu/github/orchestration_server/venv/bin/celery -A app.celery_app flower -l INFO
 Restart=always
+Environment="FLOWER_UNAUTHENTICATED_API=true"

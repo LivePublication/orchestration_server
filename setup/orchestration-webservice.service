@@ -10,7 +10,6 @@ ExecStart=/home/ubuntu/github/orchestration_server/venv/bin/gunicorn -b localhos
 # If the server needs to call some external exe (e.g.: quarto), install/symlink it in /bin/ and uncomment the below
 #Environment="PATH=/bin/"
 Restart=always
-Environment="FLOWER_UNAUTHENTICATED_API=true"
 
 [Install]
 WantedBy=multi-user.target
