@@ -67,12 +67,14 @@ def flow_status(id: str):
     result = AsyncResult(id)
 
     status = requests.get(f'http://localhost:5555/api/task/info/{id}').json()
+    start_time_seconds = status['started']
+    elapsed_time = datetime.datetime.now() - datetime.datetime.fromtimestamp(start_time_seconds)
 
     if result.ready():
         return flask.jsonify({'status': 'complete'})
     else:
         return flask.jsonify({
-            'task_status': status,
+            'task_status': elapsed_time.strftime("%H:%M:%S"),
             'status': result.state,
             'time_elapsed': getattr(result, 'start_time', datetime.datetime.now()).strftime("%H:%M:%S"),
         })
