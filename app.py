@@ -64,25 +64,27 @@ def start_flow():
 
 @app.route('/flow_status/<id>', methods=['GET'])
 def flow_status(id: str):
-    result = AsyncResult(id)
+    # result = AsyncResult(id)
 
+    # Retrieve task state from flower API
     status = requests.get(f'http://localhost:5555/api/task/info/{id}').json()
-    start_time_seconds = status['started']
-    elapsed_time = datetime.datetime.now() - datetime.datetime.fromtimestamp(start_time_seconds)
+    submit_time = datetime.datetime.fromtimestamp(status['received'])
+    # start_time = datetime.datetime.fromtimestamp(status['started'])
+    # This is probably the most recent update - only valid if the task has finished/errored
+    end_time = datetime.datetime.fromtimestamp(status['timestamp'])
 
-    if result.ready():
-        return flask.jsonify({'status': 'complete'})
+    # Elapsed time (complete vs. in progress)
+    if status['state'] in ['SUCCESS', 'FAILURE', 'REVOKED']:
+        elapsed_time = datetime.datetime.now() - end_time
     else:
-        return flask.jsonify({
-            'task_status': str(elapsed_time),
-            'status': result.state,
-            'time_elapsed': getattr(result, 'start_time', datetime.datetime.now()).strftime("%H:%M:%S"),
-        })
+        elapsed_time = datetime.datetime.now() - submit_time
 
-
-@celery.signals.task_prerun.connect
-def add_task_start_time(**kwargs):
-    current_task.start_time = datetime.datetime.now()
+    # Return state
+    return flask.jsonify({
+        'status': status['state'],
+        'start_time': submit_time.strftime('%X %x'),
+        'time_elapsed': str(elapsed_time),
+    })
 
 
 @shared_task(ignore_result=True)

@@ -8,5 +8,5 @@ Wants=orchestration-webservice.flower.service
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/github/orchestration_server
-ExecStart=/home/ubuntu/github/orchestration_server/venv/bin/celery -A app.celery_app worker
+ExecStart=/home/ubuntu/github/orchestration_server/venv/bin/celery -A app.celery_app worker -l info -f /home/ubuntu/celery.log
 Restart=always
