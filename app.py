@@ -1,5 +1,6 @@
 import contextlib
 import datetime
+import shutil
 import subprocess
 from os import path
 
@@ -75,6 +76,9 @@ def start_flow():
             'task_id': started_tasks[0]
         })
     else:
+        # Remove output folders
+        shutil.rmtree(path.join('generated_versions', 'LiD', 'V1'), ignore_errors=True)
+        # Start flow
         result = run_flow.delay()
         info(f'Started task {result.id}')
         return flask.jsonify({
