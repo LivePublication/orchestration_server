@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>{{ title }}</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="/static/normalize.css">
+  <link rel="stylesheet" href="/static/barebones.css">
+  <link rel="stylesheet" href="/static/style.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/static/favicon/site.webmanifest">
+
+  <!-- Additional head content -->
+  {% block head %}  {% endblock %}
+</head>
+
+<body>
+<!-- Site title and navbar -->
+<header id="site-header">
+    <div class="wrapper">
+        <h1>{{ title }}</h1>
+        <nav id="site-nav">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/papers">Papers</a></li>
+                <li><a href="/gh_papers">Github papers</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<!-- Additional headers -->
+{% block header %}
+
+{% endblock %}
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+{% block content %}
+<div class="wrapper">
+    <div class="grid-container halves">
+          <div>
+            <p>{{ text }}</p>
+          </div>
+        </div>
+      </div>
+</div>
+{% endblock %}
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>

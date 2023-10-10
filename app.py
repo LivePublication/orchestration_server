@@ -1,12 +1,18 @@
+import contextlib
 import datetime
+import subprocess
+from os import path
+
 import numpy as np
 import flask
 import logging
 
 import requests
+from bs4 import BeautifulSoup
 from celery import shared_task, current_task, Task
 from celery.result import AsyncResult
 import celery.signals
+from markupsafe import Markup
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pathlib import Path
 
@@ -124,6 +130,49 @@ def run_flow():
     orchestration_crate.clean_up()         # Remove local temp directories and files
 
     apply_template("generated_versions/LiD/" + config['run_label'] + "/") # Very simple 'applciation' of quarto template to the orchestration crate
+
+
+@app.route('/render/<id>/', methods=['GET'])
+def render_paper(id):
+    try:
+        # TODO: hard coded repo for now
+        folder = 'generated_versions/LiD/V1'
+        if not path.isdir(folder):
+            info(f'Folder {folder} does not exist')
+            raise FileNotFoundError(f'Folder {folder} does not exist')
+
+        # Run quarto
+        index_file = path.join(folder, 'index.qmd')
+        if not path.isfile(index_file):
+            info(f'No index.qmd file in {folder}')
+            raise FileNotFoundError(f'No index.qmd file in {folder}')
+
+        render_file = path.join(folder, 'paper_render.html')
+
+        with contextlib.chdir(folder):
+            info(f'Rendering {index_file} to {render_file}')
+            subprocess.check_call(['quarto', 'render', index_file,
+                                   '--to', 'html', '--output', path.basename(render_file),
+                                   '--execute'])
+
+        # Wrap html in layout
+        with open(render_file, 'r', encoding='utf-8') as f:
+            html = f.read()
+
+        soup = BeautifulSoup(html, 'html.parser')
+
+        head = ''.join(str(c) for c in soup.head.contents)
+        header = ''.join(str(c) for c in soup.header.contents)
+        body = soup.find(id='quarto-content')
+
+        return flask.render_template('quarto_paper.html',
+                               title='Live Publications',
+                               head=Markup(head),
+                               header=Markup(header),
+                               content=Markup(body),)
+    except FileNotFoundError as e:
+        logging.error(e)
+        flask.abort(404)
 
 
 # Example POST REST endpoint

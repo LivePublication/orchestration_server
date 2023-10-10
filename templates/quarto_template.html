@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    {{ head }}
+{% endblock %}
+
+{% block header %}
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+    {{ header }}
+
+
+    <!-- Links to next/previous paper if available-->
+    <div class="flex-div-space-around">
+        {% if prev_slug %}
+        <a href="/gh_papers/{{ prev_slug }}">Previous version</a>
+        {% endif %}
+        {% if next_slug %}
+        <a href="/gh_papers/{{ next_slug }}">Next version</a>
+        {% endif %}
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+    {{ content }}
+{% endblock %}

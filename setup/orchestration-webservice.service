@@ -8,7 +8,7 @@ User=ubuntu
 WorkingDirectory=/home/ubuntu/github/orchestration_server
 ExecStart=/home/ubuntu/github/orchestration_server/venv/bin/gunicorn -b localhost:5000 -w 4 --log-file /home/ubuntu/gunicorn.log --log-level DEBUG app:app
 # If the server needs to call some external exe (e.g.: quarto), install/symlink it in /bin/ and uncomment the below
-#Environment="PATH=/bin/"
+Environment="PATH=/bin/"
 Restart=always
 
 [Install]
