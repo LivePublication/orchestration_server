@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 from celery import shared_task, current_task, Task
 from celery.result import AsyncResult
 import celery.signals
-from markupsafe import Markup
+from markupsafe import Markup, escape
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pathlib import Path
 
@@ -151,7 +151,7 @@ def render_paper(id):
 
         with contextlib.chdir(folder):
             info(f'Rendering {index_file} to {render_file}')
-            subprocess.check_call(['quarto', 'render', index_file,
+            subprocess.check_call(['quarto', 'render', path.basename(index_file),
                                    '--to', 'html', '--output', path.basename(render_file),
                                    '--execute'])
 
@@ -172,6 +172,20 @@ def render_paper(id):
                                content=Markup(body),)
     except FileNotFoundError as e:
         logging.error(e)
+        flask.abort(404)
+
+
+@app.route('/render/<id>/<path:filespec>')
+def paper_files(id, filespec):
+    """Serve files (libraries and artefacts) from a paper"""
+    _filespec = escape(filespec)
+
+    try:
+        # TODO: hardcoded for now
+        repo_dir = 'generated_versions/LiD/V1'
+
+        return flask.send_from_directory(repo_dir, _filespec)
+    except FileNotFoundError:
         flask.abort(404)
 
 
