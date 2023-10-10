@@ -112,6 +112,42 @@ def flow_status(id: str):
     })
 
 
+@app.route('/push_to_git/<id>', methods=['GET'])
+def push_to_git(id: str):
+    # TODO: hardcoded for now
+    git_repo = path.expanduser('~/github/LP_Pub_LID')
+
+    render_file = path.join('generated_versions', 'LiD', 'V1', 'paper_render.html')
+    if path.isfile(render_file):
+        shutil.copyfile(render_file, path.join(git_repo, 'index.html'))
+    else:
+        return flask.jsonify({
+            'status': 'No render file',
+        })
+
+    # TODO: this does the most basic push, and uses my user, rather than the app
+    with contextlib.chdir(git_repo):
+        subprocess.check_call(['git', 'add', 'index.html'])
+        subprocess.check_call(['git', 'commit', '-m', 'push from editor'])
+        subprocess.check_call(['git', 'push'])
+
+    return flask.jsonify({
+        'status': 'Success',
+    })
+
+    # remote_repo = get_repo('LivePublication', 'LP_Pub_LID')
+    # local_repo = pygit2.Repository(git_repo)
+    # local_repo.index.add_all()
+    # local_repo.index.write()
+    # author = pygit2.Signature('Nelis Drost', 'seregon888@gmail.com')
+    # committer = pygit2.Signature('Nelis Drost', 'seregon888@gmail.com')
+    # tree = local_repo.index.write_tree()
+    # oid = local_repo.create_commit('refs/heads/main', author, committer, 'push from editor', tree, [local_repo.head.get_object().hex])
+    # remote = local_repo.remotes['origin']
+    # credentials = pygit2.UserPass('...', '...')
+    # remote.credentials = credentials
+    #
+
 @shared_task(ignore_result=True)
 def run_flow():
     local_gcp = LocalGlobusConnectPersonal()
