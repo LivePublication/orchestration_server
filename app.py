@@ -64,8 +64,23 @@ def static_favicon(filespec):
 
 @app.route('/start_flow', methods=['POST'])
 def start_flow():
-    result = run_flow.delay()
-    return flask.jsonify({'task_id': result.id})
+    # Check there's not already a task running (for now)
+    tasks = requests.get('http://localhost:5555/api/tasks').json()
+    started_tasks = [k for k, v in tasks.items if v['state'] in ['PENDING', 'RECEIVED', 'STARTED']]
+
+    if len(started_tasks):
+        info(f'Already started task {started_tasks[0]}')
+        return flask.jsonify({
+            'status': 'Already started',
+            'task_id': started_tasks[0]
+        })
+    else:
+        result = run_flow.delay()
+        info(f'Started task {result.id}')
+        return flask.jsonify({
+            'status': 'Task started',
+            'task_id': result.id
+        })
 
 
 @app.route('/flow_status/<id>', methods=['GET'])
