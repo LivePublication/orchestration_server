@@ -66,7 +66,7 @@ def static_favicon(filespec):
 def start_flow():
     # Check there's not already a task running (for now)
     tasks = requests.get('http://localhost:5555/api/tasks').json()
-    started_tasks = [k for k, v in tasks.items if v['state'] in ['PENDING', 'RECEIVED', 'STARTED']]
+    started_tasks = [k for k, v in tasks.items() if v['state'] in ['PENDING', 'RECEIVED', 'STARTED']]
 
     if len(started_tasks):
         info(f'Already started task {started_tasks[0]}')
