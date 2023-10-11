@@ -117,6 +117,19 @@ def push_to_git(id: str):
     # TODO: hardcoded for now
     git_repo = path.expanduser('~/github/LP_Pub_LID')
 
+    # Update local repo
+    try:
+        with contextlib.chdir(git_repo):
+            subprocess.check_call(['git', 'fetch'])
+            subprocess.check_call(['git', 'reset', '--hard'])
+            subprocess.check_call(['git', 'pull'])
+    except subprocess.CalledProcessError as e:
+        return flask.jsonify({
+            'status': 'Error',
+            'message': str(e),
+        })
+
+    # Copy render file
     render_file = path.join('generated_versions', 'LiD', 'V1', 'paper_render.html')
     if path.isfile(render_file):
         shutil.copyfile(render_file, path.join(git_repo, 'index.html'))
@@ -126,10 +139,16 @@ def push_to_git(id: str):
         })
 
     # TODO: this does the most basic push, and uses my user, rather than the app
-    with contextlib.chdir(git_repo):
-        subprocess.check_call(['git', 'add', 'index.html'])
-        subprocess.check_call(['git', 'commit', '-m', 'push from editor'])
-        subprocess.check_call(['git', 'push'])
+    try:
+        with contextlib.chdir(git_repo):
+            subprocess.check_call(['git', 'add', 'index.html'])
+            subprocess.check_call(['git', 'commit', '-m', 'push from editor'])
+            subprocess.check_call(['git', 'push'])
+    except subprocess.CalledProcessError as e:
+        return flask.jsonify({
+            'status': 'Error',
+            'message': str(e),
+        })
 
     return flask.jsonify({
         'status': 'Success',
