@@ -8,6 +8,7 @@ import numpy as np
 import flask
 import logging
 
+import pygit2
 import requests
 from bs4 import BeautifulSoup
 from celery import shared_task, current_task, Task
@@ -18,6 +19,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from pathlib import Path
 
 from celeryapp.celeryapp import celery_init_app
+from gitapp import get_repo
 from orchestration_logic.LidFlow import LidFlow
 from orchestration_logic.orchestration_crate import Orchestration_crate
 from orchestration_logic.orchestration_types import OrchestrationData
@@ -233,6 +235,8 @@ def render_paper(id):
         with open(render_file, 'r', encoding='utf-8') as f:
             html = f.read()
 
+        return html
+        # Extract html so that we can insert it correctly into templates
         soup = BeautifulSoup(html, 'html.parser')
 
         head = ''.join(str(c) for c in soup.head.contents)
