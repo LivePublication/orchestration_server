@@ -1,33 +1,24 @@
 import contextlib
 import datetime
+import logging
 import shutil
 import subprocess
 from os import path
 
-import numpy as np
 import flask
-import logging
-
-import pygit2
 import requests
 from bs4 import BeautifulSoup
-from celery import shared_task, current_task, Task
-from celery.result import AsyncResult
-import celery.signals
+from celery import shared_task
+from globus_sdk import LocalGlobusConnectPersonal
 from markupsafe import Markup, escape
 from werkzeug.middleware.proxy_fix import ProxyFix
-from pathlib import Path
 
+from apply_template import apply_template
 from celeryapp.celeryapp import celery_init_app
-from gitapp import get_repo
+from flow_config import *
 from orchestration_logic.LidFlow import LidFlow
 from orchestration_logic.orchestration_crate import Orchestration_crate
 from orchestration_logic.orchestration_types import OrchestrationData
-from globus_sdk import LocalGlobusConnectPersonal
-from flow_config import *
-
-from apply_template import apply_template
-
 
 app = flask.Flask(__name__)
 app.wsgi_app = ProxyFix(
